@@ -41,62 +41,8 @@ from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv()) # read local .env file
 hf_api_key = os.environ['HF_API_KEY']
 
-# Helper function
-import requests, json
-
-#Summarization endpoint
-def get_completion(inputs, parameters=None,ENDPOINT_URL=os.environ['HF_API_SUMMARY_BASE']): 
-    headers = {
-      "Authorization": f"Bearer {hf_api_key}",
-      "Content-Type": "application/json"
-    }
-    data = { "inputs": inputs }
-    if parameters is not None:
-        data.update({"parameters": parameters})
-    response = requests.request("POST",
-                                ENDPOINT_URL, headers=headers,
-                                data=json.dumps(data)
-                               )
-    return json.loads(response.content.decode("utf-8"))
-
-text = ('''Generative AI (GenAI) is a powerful type of artificial intelligence capable of creating new 
-        content—including text, images, code, and music—rather than just classifying or analyzing 
-        existing data. At its core are Large Language Models (LLMs) and other deep learning 
-        architectures trained on vast datasets. These models learn patterns and structures, allowing 
-        them to produce outputs that are remarkably original and contextually relevant. The applications 
-        of GenAI span industries, from automating content creation and accelerating scientific discovery 
-        to revolutionizing software development and personalized customer experiences. Its rapid 
-        evolution marks a significant shift, raising important questions about creativity, ethics, and the 
-        future of work.''')
-
-get_completion(text)
-
-import gradio as gr
-def summarize(input):
-    output = get_completion(input)
-    return output[0]['summary_text']
-    
-gr.close_all()
-demo = gr.Interface(fn=summarize, inputs="text", outputs="text")
-demo.launch(share=True, server_port=int(os.environ['PORT1']))
-
-import gradio as gr
-
-def summarize(input):
-    output = get_completion(input)
-    return output[0]['summary_text']
-
-gr.close_all()
-demo = gr.Interface(fn=summarize, 
-                    inputs=[gr.Textbox(label="Text to summarize", lines=6)],
-                    outputs=[gr.Textbox(label="Result", lines=3)],
-                    title="Text summarization with distilbart-cnn",
-                    description="Summarize any text using the `shleifer/distilbart-cnn-12-6` model under the hood!"
-                   )
-demo.launch(share=True, server_port=int(os.environ['PORT2']))
-
 API_URL = os.environ['HF_API_NER_BASE'] #NER endpoint
-text = "My name is Sethukkarasi, I'm building DeepLearningAI and I live in Chennai"
+text = "my name is Hezron and i play guitar. i live in chennai with my parents"
 get_completion(text, parameters=None, ENDPOINT_URL= API_URL)
 
 def ner(input):
@@ -111,7 +57,7 @@ demo = gr.Interface(fn=ner,
                     description="Find entities using the `dslim/bert-base-NER` model under the hood!",
                     allow_flagging="never",
                     #Here we introduce a new tag, examples, easy to use examples for your application
-                    examples=["My name is Sethukkarasi and I live in Chennai", "My name is Elan and work at Pondicherry"])
+                    examples=["my name is Hezron and i play guitar. i live in chennai with my parents"])
 demo.launch(share=True, server_port=int(os.environ['PORT3']))
 
 def merge_tokens(tokens):
@@ -141,7 +87,7 @@ demo = gr.Interface(fn=ner,
                     title="NER with dslim/bert-base-NER",
                     description="Find entities using the `dslim/bert-base-NER` model under the hood!",
                     allow_flagging="never",
-                    examples=["My name is Sethukkarasi, I'm building DeeplearningAI and I live in Chennai", "My name is Elan, I live in Pondicherry and work at HuggingFace"])
+                    examples=["my name is Hezron and i play guitar. i live in chennai with my parents"])
 
 demo.launch(share=True, server_port=int(os.environ['PORT4']))
 
